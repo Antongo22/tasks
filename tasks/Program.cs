@@ -268,6 +268,7 @@ namespace tasks
             {
                 Console.WriteLine($"Выбрана задача с id {taskId}.");
 
+                action:
                 Console.Write("Выберите действие (name, description, addSubTask, removeSubTask, end): ");
                 string action = Console.ReadLine();
 
@@ -276,18 +277,33 @@ namespace tasks
                     case "name":
                         Console.Write("Введите новое имя: ");
                         string newName = Console.ReadLine();
+                        if (newName == "0")
+                        {
+                            Console.WriteLine("Отмена действий");
+                            return;
+                        }
                         taskNodeToChange.SelectSingleNode("name").InnerText = newName;
                         break;
 
                     case "description":
                         Console.Write("Введите новое описание: ");
                         string newDescription = Console.ReadLine();
+                        if (newDescription == "0")
+                        {
+                            Console.WriteLine("Отмена действий");
+                            return;
+                        }
                         taskNodeToChange.SelectSingleNode("description").InnerText = newDescription;
                         break;
 
                     case "addSubTask":
                         Console.Write("Введите новую подзадачу: ");
                         string newSubTask = Console.ReadLine();
+                        if (newSubTask == "0")
+                        {
+                            Console.WriteLine("Отмена действий");
+                            return;
+                        }
                         AddSubTask(xmlDoc, taskNodeToChange, newSubTask);
                         break;
 
@@ -322,7 +338,7 @@ namespace tasks
 
                     default:
                         Console.WriteLine("Некорректное действие. Отмена.");
-                        return;
+                        goto action;
                 }
 
                 // Сохранение изменений в XML-документе
