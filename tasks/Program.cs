@@ -11,7 +11,6 @@ namespace tasks
 {
     internal class Program
     {
-
         static void Menu()
         {
             Console.WriteLine("Доступные команды:");
@@ -52,7 +51,8 @@ namespace tasks
         static void SetSubTasks(XmlDocument xmlDoc, XmlElement newTask)
         {
             string command = "";
-            while(command != "0")
+
+            while (command != "0")
             {
                 Console.Write("Введите подзадачу или 0 для завершения: ");
                 command = Console.ReadLine();
@@ -131,11 +131,17 @@ namespace tasks
             return task;
         }
 
-        static void AddSubTask(XmlDocument xmlDoc, XmlElement task, string subTaskName)
+        static void AddSubTask(XmlDocument xmlDoc, XmlNode taskNode, string subTaskName)
         {
             XmlElement subTask = xmlDoc.CreateElement("SubTask");
+
+            // Генерируем id для подзадачи, основываясь на предыдущей подзадаче (если она есть)
+            XmlNode lastSubTask = taskNode.SelectSingleNode("SubTask[last()]");
+            int id = (lastSubTask != null) ? int.Parse(lastSubTask.Attributes["id"].Value) + 1 : 0;
+            subTask.SetAttribute("id", id.ToString());
+
             subTask.InnerText = subTaskName;
-            task.AppendChild(subTask);
+            taskNode.AppendChild(subTask);
         }
 
         #endregion
@@ -168,7 +174,7 @@ namespace tasks
                     string description = taskNode.SelectSingleNode("description")?.InnerText;
                     string status = taskNode.SelectSingleNode("status")?.InnerText;
 
-                    Console.WriteLine($"{name} с id - {id}.\tСтатус - {status}");
+                    Console.WriteLine($"{name} с id - {id}. Статус - {status}");
                     Console.WriteLine($"\t{description}");
 
                     XmlNodeList subTaskNodes = taskNode.SelectNodes("SubTask");
@@ -176,7 +182,8 @@ namespace tasks
                     {
                         foreach (XmlNode subTaskNode in subTaskNodes)
                         {
-                            Console.WriteLine($"\t\t{subTaskNode.InnerText}");
+                            string subTaskId = subTaskNode.Attributes["id"]?.Value;
+                            Console.WriteLine($"\t\tПодзадача с id - {subTaskId}: {subTaskNode.InnerText}");
                         }
                     }
 
@@ -188,6 +195,7 @@ namespace tasks
                 Console.WriteLine("Задачи не найдены.");
             }
         }
+
         #endregion
 
         #region RemoveTask
@@ -221,6 +229,92 @@ namespace tasks
         }
         #endregion
 
+        #region ChangeTask
+        static void ChangeTask()
+        {
+            XmlDocument xmlDoc = LoadExistingXmlDocument();
+
+            Console.Write("Введите id задачи для изменения (end для отмены): ");
+            string taskId = Console.ReadLine();
+
+            if (taskId == "end")
+            {
+                Console.WriteLine("Отмена");
+                return;
+            }
+
+            XmlNode taskNodeToChange = xmlDoc.SelectSingleNode($"//Task[@id='{taskId}']");
+
+            if (taskNodeToChange != null)
+            {
+                Console.WriteLine($"Выбрана задача с id {taskId}.");
+
+                Console.Write("Выберите действие (name, description, addSubTask, removeSubTask, end): ");
+                string action = Console.ReadLine();
+
+                switch (action)
+                {
+                    case "name":
+                        Console.Write("Введите новое имя: ");
+                        string newName = Console.ReadLine();
+                        taskNodeToChange.SelectSingleNode("name").InnerText = newName;
+                        break;
+
+                    case "description":
+                        Console.Write("Введите новое описание: ");
+                        string newDescription = Console.ReadLine();
+                        taskNodeToChange.SelectSingleNode("description").InnerText = newDescription;
+                        break;
+
+                    case "addSubTask":
+                        Console.Write("Введите новую подзадачу: ");
+                        string newSubTask = Console.ReadLine();
+                        AddSubTask(xmlDoc, taskNodeToChange, newSubTask);
+                        break;
+
+                    case "removeSubTask":
+                        Console.Write("Введите id подзадачи для удаления: ");
+                        string subTaskIdToRemove = Console.ReadLine();
+                        RemoveSubTask(xmlDoc, taskNodeToChange, subTaskIdToRemove);
+                        break;
+
+                    case "end":
+                        Console.WriteLine("Отмена");
+                        return;
+
+                    default:
+                        Console.WriteLine("Некорректное действие. Отмена.");
+                        return;
+                }
+
+                // Сохранение изменений в XML-документе
+                xmlDoc.Save("tasks.xml");
+
+                Console.WriteLine("Изменения успешно сохранены.");
+            }
+            else
+            {
+                Console.WriteLine($"Задача с id {taskId} не найдена.");
+            }
+        }
+
+        static void RemoveSubTask(XmlDocument xmlDoc, XmlNode taskNode, string subTaskId)
+        {
+            XmlNode subTaskNodeToRemove = taskNode.SelectSingleNode($"SubTask[@id='{subTaskId}']");
+
+            if (subTaskNodeToRemove != null)
+            {
+                taskNode.RemoveChild(subTaskNodeToRemove);
+                Console.WriteLine($"Подзадача с id {subTaskId} успешно удалена.");
+            }
+            else
+            {
+                Console.WriteLine($"Подзадача с id {subTaskId} не найдена.");
+            }
+        }
+
+        #endregion
+
         static void Commmand(int command)
         {
             switch (command)
@@ -236,6 +330,9 @@ namespace tasks
                     break;
                 case 3:
                     SetTask();
+                    break;
+                case 4:
+                    ChangeTask();
                     break;
                 case 5:
                     RemoveTask(); 
