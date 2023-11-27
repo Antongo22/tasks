@@ -20,6 +20,7 @@ namespace tasks
             Console.WriteLine("3 - Добавить запись");
             Console.WriteLine("4 - Редактировать запись");
             Console.WriteLine("5 - Удалить запись");
+
             Console.WriteLine();
         }
 
@@ -212,6 +213,24 @@ namespace tasks
                 return;
             }
 
+            conf:
+            Console.Write("Вы уверены в удалениии (1/0)");
+            string conf = Console.ReadLine();
+            if(conf == "0")
+            {
+                Console.WriteLine("Отмена");
+                return;
+            }
+            else if (conf == "1")
+            {
+                Console.WriteLine("Удаление подтверждено");
+            }
+            else
+            {
+                Console.WriteLine("Команда не принята. Повторите попытку");
+                goto conf;
+            }
+
             XmlNode taskNodeToRemove = xmlDoc.SelectSingleNode($"//Task[@id='{taskId}']");
 
             if (taskNodeToRemove != null)
@@ -275,6 +294,25 @@ namespace tasks
                     case "removeSubTask":
                         Console.Write("Введите id подзадачи для удаления: ");
                         string subTaskIdToRemove = Console.ReadLine();
+
+                    conf:
+                        Console.Write("Вы уверены в удалениии (1/0)");
+                        string conf = Console.ReadLine();
+                        if (conf == "0")
+                        {
+                            Console.WriteLine("Отмена");
+                            return;
+                        }
+                        else if (conf == "1")
+                        {
+                            Console.WriteLine("Удаление подтверждено");
+                        }
+                        else
+                        {
+                            Console.WriteLine("Команда не принята. Повторите попытку");
+                            goto conf;
+                        }
+
                         RemoveSubTask(xmlDoc, taskNodeToChange, subTaskIdToRemove);
                         break;
 
@@ -337,16 +375,11 @@ namespace tasks
                 case 5:
                     RemoveTask(); 
                     break;
-
                 default:
                     Console.WriteLine("Неверная команда. Повторите попытку");
-                    break;
-                   
+                    break;                  
             }
         }
-
-
-        
 
         static void Main(string[] args)
         {
