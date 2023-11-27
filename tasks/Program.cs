@@ -12,20 +12,6 @@ namespace tasks
 {
     internal class Program
     {
-        static void Menu()
-        {
-            Console.WriteLine("Доступные команды:");
-            Console.WriteLine("0 - Завершение работы");
-            Console.WriteLine("1 - Просмотр команд");
-            Console.WriteLine("2 - Посмотреть все записи");
-            Console.WriteLine("3 - Добавить запись");
-            Console.WriteLine("4 - Редактировать запись");
-            Console.WriteLine("5 - Удалить запись");
-            Console.WriteLine("6 - Полная очистка");
-
-            Console.WriteLine();
-        }
-
         #region SetTask
         static string[] SetParams()
         {
@@ -393,6 +379,21 @@ namespace tasks
 
         #endregion
 
+        #region Base
+        static void Menu()
+        {
+            Console.WriteLine("Доступные команды:");
+            Console.WriteLine("0 - Завершение работы");
+            Console.WriteLine("1 - Просмотр команд");
+            Console.WriteLine("2 - Посмотреть все записи");
+            Console.WriteLine("3 - Добавить запись");
+            Console.WriteLine("4 - Редактировать запись");
+            Console.WriteLine("5 - Удалить запись");
+            Console.WriteLine("6 - Полная очистка");
+
+            Console.WriteLine();
+        }
+
         static void Commmand(int command)
         {
             switch (command)
@@ -431,6 +432,8 @@ namespace tasks
                     break;                  
             }
         }
+
+        #endregion
 
         static void Main(string[] args)
         {
