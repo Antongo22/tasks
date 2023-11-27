@@ -192,7 +192,7 @@ namespace tasks
                         }
                     }
 
-                    Console.WriteLine();
+                    Console.WriteLine(new string('-', 90));
                 }
             }
             else
@@ -399,27 +399,35 @@ namespace tasks
             {
                 case 0:
                     Console.WriteLine("Заверщение работы команды");
+                    Console.WriteLine();
                     break;
                 case 1:
                     Menu();
+                    Console.WriteLine();
                     break;
                 case 2:
                     GetTasks();
+                    Console.WriteLine();
                     break;
                 case 3:
                     SetTask();
+                    Console.WriteLine();
                     break;
                 case 4:
                     ChangeTask();
+                    Console.WriteLine();
                     break;
                 case 5:
-                    RemoveTask(); 
+                    RemoveTask();
+                    Console.WriteLine();
                     break;
                 case 6:
                     RemoveFile();
+                    Console.WriteLine();
                     break;
                 default:
                     Console.WriteLine("Неверная команда. Повторите попытку");
+                    Console.WriteLine();
                     break;                  
             }
         }
