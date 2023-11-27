@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -28,15 +29,18 @@ namespace tasks
 
             Console.Write("Введите имя задачи: ");
             string name = Console.ReadLine();
+            if (name == "0") return null;
 
             Console.Write("Введите описание задачи: ");
             string description = Console.ReadLine();
+            if (description == "0") return null;
 
             string status = "";
             while (!statuses.Contains(status.ToLower()))
             {
                 Console.Write("Введите статус задачи (Предстоит, В процессе, Завершено): ");
                 status = Console.ReadLine();
+                if (status == "0") return null;
                 Console.WriteLine();
             }
 
@@ -63,6 +67,11 @@ namespace tasks
             XmlDocument xmlDoc = LoadExistingXmlDocument() ?? CreateNewXmlDocument();
 
             string[] task = SetParams();
+            if (task == null)
+            {
+                Console.WriteLine("Процесс заполнения задачи прерван!");
+                return;
+            }
             XmlElement newTask = CreateTask(xmlDoc, task[0], task[1], task[2]);
 
             SetSubTasks(xmlDoc, newTask);
@@ -129,6 +138,55 @@ namespace tasks
 
         #endregion
 
+        #region GetTasks
+        static void GetTasks()
+        {
+            XmlDocument xmlDoc = LoadExistingXmlDocument();
+
+            if (xmlDoc != null)
+            {
+                DisplayAllTasks(xmlDoc);
+            }
+            else
+            {
+                Console.WriteLine("XML-документ не найден.");
+            }
+        }
+
+        static void DisplayAllTasks(XmlDocument xmlDoc)
+        {
+            XmlNodeList taskNodes = xmlDoc.SelectNodes("//Task");
+
+            if (taskNodes != null)
+            {
+                foreach (XmlNode taskNode in taskNodes)
+                {
+                    string id = taskNode.Attributes["id"].Value;
+                    string name = taskNode.SelectSingleNode("name")?.InnerText;
+                    string description = taskNode.SelectSingleNode("description")?.InnerText;
+
+                    Console.WriteLine($"{name} с id - {id}");
+                    Console.WriteLine($"\t{description}");
+
+                    XmlNodeList subTaskNodes = taskNode.SelectNodes("SubTask");
+                    if (subTaskNodes != null)
+                    {
+                        foreach (XmlNode subTaskNode in subTaskNodes)
+                        {
+                            Console.WriteLine($"\t\t{subTaskNode.InnerText}");
+                        }
+                    }
+
+                    Console.WriteLine();
+                }
+            }
+            else
+            {
+                Console.WriteLine("Задачи не найдены.");
+            }
+        }
+        #endregion
+
         static void Commmand(int command)
         {
             switch (command)
@@ -138,6 +196,9 @@ namespace tasks
                     break;
                 case 1:
                     Menu();
+                    break;
+                case 2:
+                    GetTasks();
                     break;
                 case 3:
                     SetTask();
