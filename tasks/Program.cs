@@ -179,7 +179,7 @@ namespace tasks
                         foreach (XmlNode subTaskNode in subTaskNodes)
                         {
                             string subTaskId = subTaskNode.Attributes["id"]?.Value;
-                            Console.WriteLine($"\t\tПодзадача с id - {subTaskId}: {subTaskNode.InnerText}");
+                            Console.WriteLine($"\t\tПодзадача с id - {subTaskId}:\t{subTaskNode.InnerText}");
                         }
                     }
 
