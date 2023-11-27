@@ -169,7 +169,7 @@ namespace tasks
             XmlNodeList taskNodes = xmlDoc.SelectNodes("//Task");
 
             Console.WriteLine("\nЗапии: ");
-
+            Console.WriteLine(new string('-', 90));
             if (taskNodes != null)
             {
                 foreach (XmlNode taskNode in taskNodes)
@@ -179,8 +179,8 @@ namespace tasks
                     string description = taskNode.SelectSingleNode("description")?.InnerText;
                     string status = taskNode.SelectSingleNode("status")?.InnerText;
 
-                    Console.WriteLine($"\t{name} с id - {id}. Статус - {status}");
-                    Console.WriteLine($"\t\t{description}");
+                    Console.WriteLine($"{name} с id - {id}. Статус - {status}");
+                    Console.WriteLine($"\t{description}");
 
                     XmlNodeList subTaskNodes = taskNode.SelectNodes("SubTask");
                     if (subTaskNodes != null)
@@ -188,7 +188,7 @@ namespace tasks
                         foreach (XmlNode subTaskNode in subTaskNodes)
                         {
                             string subTaskId = subTaskNode.Attributes["id"]?.Value;
-                            Console.WriteLine($"\t\t\tПодзадача с id - {subTaskId}: {subTaskNode.InnerText}");
+                            Console.WriteLine($"\t\tПодзадача с id - {subTaskId}: {subTaskNode.InnerText}");
                         }
                     }
 
