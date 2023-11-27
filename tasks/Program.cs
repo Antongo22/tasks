@@ -154,11 +154,16 @@ namespace tasks
         {
             XmlNodeList taskNodes = xmlDoc.SelectNodes("//Task");
 
-            Console.WriteLine("\nЗапии: ");
+            Console.WriteLine("\nЗаписи: ");
             Console.WriteLine(new string('-', 90));
             if (taskNodes != null)
             {
-                foreach (XmlNode taskNode in taskNodes)
+                var sortedTaskNodes = taskNodes.Cast<XmlNode>()
+                    .OrderByDescending(taskNode => taskNode.SelectSingleNode("status")?.InnerText == "В ПРОЦЕССЕ")
+                    .ThenByDescending(taskNode => taskNode.SelectSingleNode("status")?.InnerText == "ПРЕДСТОИТ")
+                    .ThenByDescending(taskNode => taskNode.SelectSingleNode("status")?.InnerText == "ЗАВЕРШЕНО");
+
+                foreach (XmlNode taskNode in sortedTaskNodes)
                 {
                     string id = taskNode.Attributes["id"].Value;
                     string name = taskNode.SelectSingleNode("name")?.InnerText;
@@ -186,6 +191,7 @@ namespace tasks
                 Console.WriteLine("Задачи не найдены.");
             }
         }
+
 
         #endregion
 
@@ -438,6 +444,8 @@ namespace tasks
         static void Main(string[] args)
         {
             int actionCode = 1;
+
+            Menu();
 
             while(actionCode != 0)
             {
