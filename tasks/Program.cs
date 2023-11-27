@@ -452,7 +452,6 @@ namespace tasks
                     Console.WriteLine("Неверная команда. Для просмотра команд введите 1");
                 }
             }
-            Environment.Exit(0);
         }
     }
 }
