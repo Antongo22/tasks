@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
+using System.IO;
 
 namespace tasks
 {
@@ -20,6 +21,7 @@ namespace tasks
             Console.WriteLine("3 - Добавить запись");
             Console.WriteLine("4 - Редактировать запись");
             Console.WriteLine("5 - Удалить запись");
+            Console.WriteLine("6 - Полная очистка");
 
             Console.WriteLine();
         }
@@ -166,6 +168,8 @@ namespace tasks
         {
             XmlNodeList taskNodes = xmlDoc.SelectNodes("//Task");
 
+            Console.WriteLine("\nЗапии: ");
+
             if (taskNodes != null)
             {
                 foreach (XmlNode taskNode in taskNodes)
@@ -175,8 +179,8 @@ namespace tasks
                     string description = taskNode.SelectSingleNode("description")?.InnerText;
                     string status = taskNode.SelectSingleNode("status")?.InnerText;
 
-                    Console.WriteLine($"{name} с id - {id}. Статус - {status}");
-                    Console.WriteLine($"\t{description}");
+                    Console.WriteLine($"\t{name} с id - {id}. Статус - {status}");
+                    Console.WriteLine($"\t\t{description}");
 
                     XmlNodeList subTaskNodes = taskNode.SelectNodes("SubTask");
                     if (subTaskNodes != null)
@@ -184,7 +188,7 @@ namespace tasks
                         foreach (XmlNode subTaskNode in subTaskNodes)
                         {
                             string subTaskId = subTaskNode.Attributes["id"]?.Value;
-                            Console.WriteLine($"\t\tПодзадача с id - {subTaskId}: {subTaskNode.InnerText}");
+                            Console.WriteLine($"\t\t\tПодзадача с id - {subTaskId}: {subTaskNode.InnerText}");
                         }
                     }
 
@@ -369,6 +373,26 @@ namespace tasks
 
         #endregion
 
+        #region RemoveFile
+        static void RemoveFile()
+        {
+            Console.Write("Вы уверены что хотети удалить все данны (y/n): ");
+            string answ = Console.ReadLine();
+
+            if(answ.ToLower() == "y")
+            {
+                Console.WriteLine("Удаление");
+                File.Delete("tasks.xml");
+                Console.WriteLine("Удалено");
+            }
+            else
+            {
+                Console.WriteLine("Отмена");
+            }
+        }
+
+        #endregion
+
         static void Commmand(int command)
         {
             switch (command)
@@ -390,6 +414,9 @@ namespace tasks
                     break;
                 case 5:
                     RemoveTask(); 
+                    break;
+                case 6:
+                    RemoveFile();
                     break;
                 default:
                     Console.WriteLine("Неверная команда. Повторите попытку");
