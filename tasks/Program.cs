@@ -5,11 +5,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using System.Xml.Linq;
 
 namespace tasks
 {
     internal class Program
     {
+
         static void Menu()
         {
             Console.WriteLine("Доступные команды:");
@@ -164,8 +166,9 @@ namespace tasks
                     string id = taskNode.Attributes["id"].Value;
                     string name = taskNode.SelectSingleNode("name")?.InnerText;
                     string description = taskNode.SelectSingleNode("description")?.InnerText;
+                    string status = taskNode.SelectSingleNode("status")?.InnerText;
 
-                    Console.WriteLine($"{name} с id - {id}");
+                    Console.WriteLine($"{name} с id - {id}.\tСтатус - {status}");
                     Console.WriteLine($"\t{description}");
 
                     XmlNodeList subTaskNodes = taskNode.SelectNodes("SubTask");
@@ -187,6 +190,37 @@ namespace tasks
         }
         #endregion
 
+        #region RemoveTask
+        static void RemoveTask()
+        {
+            XmlDocument xmlDoc = LoadExistingXmlDocument();
+
+            Console.Write("Введите id задачи для удаления (end для отменя): ");
+            string taskId = Console.ReadLine();
+
+            if (taskId == "end")
+            {
+                Console.WriteLine("Отмена");
+                return;
+            }
+
+            XmlNode taskNodeToRemove = xmlDoc.SelectSingleNode($"//Task[@id='{taskId}']");
+
+            if (taskNodeToRemove != null)
+            {
+                XmlNode parentNode = taskNodeToRemove.ParentNode;
+                parentNode?.RemoveChild(taskNodeToRemove);
+                xmlDoc.Save("tasks.xml");
+
+                Console.WriteLine($"Задача с id {taskId} успешно удалена.");
+            }
+            else
+            {
+                Console.WriteLine($"Задача с id {taskId} не найдена.");
+            }
+        }
+        #endregion
+
         static void Commmand(int command)
         {
             switch (command)
@@ -203,6 +237,10 @@ namespace tasks
                 case 3:
                     SetTask();
                     break;
+                case 5:
+                    RemoveTask(); 
+                    break;
+
                 default:
                     Console.WriteLine("Неверная команда. Повторите попытку");
                     break;
