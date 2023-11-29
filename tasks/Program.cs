@@ -264,8 +264,8 @@ namespace tasks
             {
                 Console.WriteLine($"Выбрана задача с id {taskId}.");
 
-                action:
-                Console.Write("Выберите действие (name, description, addSubTask, removeSubTask, end): ");
+            action:
+                Console.Write("Выберите действие (name, description, status, addSubTask, removeSubTask, end): ");
                 string action = Console.ReadLine();
 
                 switch (action)
@@ -292,6 +292,19 @@ namespace tasks
                         taskNodeToChange.SelectSingleNode("description").InnerText = newDescription;
                         break;
 
+                    case "status":
+                        string[] statuses = { "предстоит", "в процессе", "завершено" };
+                        string status = "";
+                        while (!statuses.Contains(status.ToLower()))
+                        {
+                            Console.Write("Введите статус задачи (Предстоит, В процессе, Завершено): ");
+                            status = Console.ReadLine();
+                            if (status == "0") return;
+                            Console.WriteLine();
+                        }
+                        taskNodeToChange.SelectSingleNode("status").InnerText = status.ToUpper();
+                        break;
+
                     case "addSubTask":
                         Console.Write("Введите новую подзадачу: ");
                         string newSubTask = Console.ReadLine();
@@ -308,7 +321,7 @@ namespace tasks
                         string subTaskIdToRemove = Console.ReadLine();
 
                     conf:
-                        Console.Write("Вы уверены в удалениии (1/0)");
+                        Console.Write("Вы уверены в удалении (1/0): ");
                         string conf = Console.ReadLine();
                         if (conf == "0")
                         {
@@ -347,6 +360,7 @@ namespace tasks
                 Console.WriteLine($"Задача с id {taskId} не найдена.");
             }
         }
+
 
         static void RemoveSubTask(XmlDocument xmlDoc, XmlNode taskNode, string subTaskId)
         {
@@ -460,6 +474,7 @@ namespace tasks
                     Console.WriteLine("Неверная команда. Для просмотра команд введите 1");
                 }
             }
+
         }
     }
 }
