@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
 using System.IO;
+using Microsoft.Win32;
 
 namespace tasks
 {
@@ -453,15 +454,66 @@ namespace tasks
             }
         }
 
+
+        static bool IsInStartup()
+        {
+            string appName = "MyApp";
+
+            using (RegistryKey key = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run"))
+            {
+                return key?.GetValue(appName) != null;
+            }
+        }
+
+        static void AddToStartup()
+        {
+            try
+            {
+                string appName = "MyApp";
+                string appPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+
+                using (RegistryKey key = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true))
+                {
+                    key.SetValue(appName, appPath);
+                }
+
+                Console.WriteLine("Программа успешно добавлена в автозагрузку.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Ошибка при добавлении в автозагрузку: {ex.Message}");
+            }
+        }
         #endregion
 
         static void Main(string[] args)
         {
-            int actionCode = 1;
+            bool isAutoStart = args.Contains("/autostart");
 
-            Menu();
+            int actionCode;
 
-            while(actionCode != 0)
+            if (isAutoStart)
+            {
+                Console.WriteLine("Ваши задачи:\n");
+                actionCode = 3; 
+            }
+            else
+            {
+                actionCode = 1;
+
+                if (!IsInStartup())
+                {
+                    Console.WriteLine("Программа не найдена в автозапуске. Добавляем себя.");
+
+                    // Добавляем программу в автозапуск
+                    AddToStartup();
+                }
+            }
+
+            Commmand(actionCode);
+
+
+            while (actionCode != 0)
             {
                 Console.Write("Введите код команды: ");
                 if (int.TryParse(Console.ReadLine(), out int ac))
