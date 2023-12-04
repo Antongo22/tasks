@@ -103,7 +103,6 @@ namespace tasks
         {
             XmlElement task = xmlDoc.CreateElement("Task");
 
-            // Генерируем id для задачи, основываясь на предыдущей задаче (если она есть)
             XmlNode lastTask = xmlDoc.SelectSingleNode("//Task[last()]");
             int id = (lastTask != null) ? int.Parse(lastTask.Attributes["id"].Value) + 1 : 0;
             task.SetAttribute("id", id.ToString());
@@ -127,7 +126,6 @@ namespace tasks
         {
             XmlElement subTask = xmlDoc.CreateElement("SubTask");
 
-            // Генерируем id для подзадачи, основываясь на предыдущей подзадаче (если она есть)
             XmlNode lastSubTask = taskNode.SelectSingleNode("SubTask[last()]");
             int id = (lastSubTask != null) ? int.Parse(lastSubTask.Attributes["id"].Value) + 1 : 0;
             subTask.SetAttribute("id", id.ToString());
@@ -353,7 +351,6 @@ namespace tasks
                         goto action;
                 }
 
-                // Сохранение изменений в XML-документе
                 xmlDoc.Save("tasks.xml");
 
                 Console.WriteLine("Изменения успешно сохранены.");
