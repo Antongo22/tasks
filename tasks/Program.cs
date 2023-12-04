@@ -8,6 +8,8 @@ using System.Xml;
 using System.Xml.Linq;
 using System.IO;
 using Microsoft.Win32;
+using System.Reflection;
+using IWshRuntimeLibrary;
 
 namespace tasks
 {
@@ -389,7 +391,7 @@ namespace tasks
             if(answ.ToLower() == "y")
             {
                 Console.WriteLine("Удаление");
-                File.Delete("tasks.xml");
+                System.IO.File.Delete("tasks.xml");
                 Console.WriteLine("Удалено");
             }
             else
@@ -404,16 +406,17 @@ namespace tasks
         static void Menu()
         {
             Console.WriteLine("Доступные команды:");
-            Console.WriteLine("0 - Завершение работы");
-            Console.WriteLine("1 - Просмотр команд");
-            Console.WriteLine("2 - Посмотреть все записи");
-            Console.WriteLine("3 - Добавить запись");
-            Console.WriteLine("4 - Редактировать запись");
-            Console.WriteLine("5 - Удалить запись");
-            Console.WriteLine("6 - Полная очистка");
-            Console.WriteLine("7 - Добавить программу в автозапуск");
-            Console.WriteLine("8 - Удаление программы из автозапуска");
-            Console.WriteLine("9 - Статус автозапауска");
+            Console.WriteLine("0  - Завершение работы");
+            Console.WriteLine("1  - Просмотр команд");
+            Console.WriteLine("2  - Посмотреть все записи");
+            Console.WriteLine("3  - Добавить запись");
+            Console.WriteLine("4  - Редактировать запись");
+            Console.WriteLine("5  - Удалить запись");
+            Console.WriteLine("6  - Полная очистка");
+            Console.WriteLine("7  - Добавить программу в автозапуск");
+            Console.WriteLine("8  - Удаление программы из автозапуска");
+            Console.WriteLine("9  - Статус автозапауска");
+            Console.WriteLine("10 - Создать ярлык приложения");
 
             Console.WriteLine();
         }
@@ -462,6 +465,10 @@ namespace tasks
                     Console.WriteLine($"Состояние автозапуска - {IsInStartup()}");
                     Console.WriteLine();
                     break;
+                case 10:
+                    CreateShortcut();
+                    Console.WriteLine();
+                    break;
                 default:
                     Console.WriteLine("Неверная команда. Повторите попытку");
                     Console.WriteLine();
@@ -472,7 +479,7 @@ namespace tasks
 
         static bool IsInStartup()
         {
-            string appName = "Task";
+            string appName = "Tasks";
 
             using (RegistryKey key = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run"))
             {
@@ -484,7 +491,7 @@ namespace tasks
         {
             try
             {
-                string appName = "Task";
+                string appName = "Tasks";
                 string appPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
 
                 using (RegistryKey key = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true))
@@ -504,7 +511,7 @@ namespace tasks
         {
             try
             {
-                string appName = "Task";
+                string appName = "Tasks";
 
                 using (RegistryKey key = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true))
                 {
@@ -518,6 +525,43 @@ namespace tasks
                 Console.WriteLine($"Ошибка при удалении из автозапуска: {ex.Message}");
             }
         }
+
+        static void CreateShortcut()
+        {
+            string currentDirectory = Directory.GetCurrentDirectory();
+
+            if (currentDirectory != null)
+            {
+                string targetExePath = Path.Combine(currentDirectory, "tasks.exe");
+                string iconPath = Path.Combine(currentDirectory, "tasks.ico");
+                string shortcutFolderPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+                string shortcutName = "Tasks";
+
+                try
+                {
+                    IWshShell3 shell = new WshShell();
+
+                    IWshShortcut shortcut = (IWshShortcut)shell.CreateShortcut(Path.Combine(shortcutFolderPath, $"{shortcutName}.lnk"));
+
+                    shortcut.TargetPath = targetExePath;
+                    shortcut.IconLocation = iconPath;
+
+                    shortcut.Save();
+
+                    Console.WriteLine("Ярлык успешно создан!");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Ошибка при создании ярлыка: {ex.Message}");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Невозможно получить путь к родительской папке.");
+            }
+        }
+
+
         #endregion
 
         static void Main(string[] args)
