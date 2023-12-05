@@ -131,7 +131,6 @@ namespace tasks
             subTask.InnerText = subTaskName;
             taskNode.AppendChild(subTask);
         }
-
         #endregion
 
         #region GetTasks
@@ -190,8 +189,6 @@ namespace tasks
                 Console.WriteLine("Задачи не найдены.");
             }
         }
-
-
         #endregion
 
         #region RemoveTask
@@ -359,7 +356,6 @@ namespace tasks
             }
         }
 
-
         static void RemoveSubTask(XmlDocument xmlDoc, XmlNode taskNode, string subTaskId)
         {
             XmlNode subTaskNodeToRemove = taskNode.SelectSingleNode($"SubTask[@id='{subTaskId}']");
@@ -374,7 +370,6 @@ namespace tasks
                 Console.WriteLine($"Подзадача с id {subTaskId} не найдена.");
             }
         }
-
         #endregion
 
         #region RemoveFile
@@ -394,23 +389,20 @@ namespace tasks
                 Console.WriteLine("Отмена");
             }
         }
-
         #endregion
 
         #region Base
         static void Menu()
         {
             Console.WriteLine("Доступные команды:");
-            Console.WriteLine("0 - Завершение работы");
-            Console.WriteLine("1 - Просмотр команд");
-            Console.WriteLine("2 - Посмотреть все записи");
-            Console.WriteLine("3 - Добавить запись");
-            Console.WriteLine("4 - Редактировать запись");
-            Console.WriteLine("5 - Удалить запись");
-            Console.WriteLine("6 - Полная очистка");
-            Console.WriteLine("7 - Добавить программу в автозапуск");
-            Console.WriteLine("8 - Удаление программы из автозапуска");
-            Console.WriteLine("9 - Статус автозапауска");
+            Console.WriteLine("0  - Завершение работы");
+            Console.WriteLine("1  - Просмотр команд");
+            Console.WriteLine("2  - Посмотреть все записи");
+            Console.WriteLine("3  - Добавить запись");
+            Console.WriteLine("4  - Редактировать запись");
+            Console.WriteLine("5  - Удалить запись");
+            Console.WriteLine("6  - Полная очистка");
+            Console.WriteLine("7  - Путь к базовой папке");
 
             Console.WriteLine();
         }
@@ -448,15 +440,7 @@ namespace tasks
                     Console.WriteLine();
                     break;
                 case 7:
-                    AddToStartup();
-                    Console.WriteLine();
-                    break;
-                case 8:
-                    RemoveFromStartup();
-                    Console.WriteLine();
-                    break;
-                case 9:
-                    Console.WriteLine($"Состояние автозапуска - {IsInStartup()}");
+                    Console.WriteLine("Путь к программе: " + Directory.GetCurrentDirectory());
                     Console.WriteLine();
                     break;
                 default:
@@ -466,69 +450,11 @@ namespace tasks
             }
         }
 
-
-        static bool IsInStartup()
-        {
-            string appName = "Task";
-
-            using (RegistryKey key = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run"))
-            {
-                return key?.GetValue(appName) != null;
-            }
-        }
-
-        static void AddToStartup()
-        {
-            try
-            {
-                string appName = "Task";
-                string appPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
-
-                using (RegistryKey key = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true))
-                {
-                    key.SetValue(appName, appPath);
-                }
-
-                Console.WriteLine("Программа успешно добавлена в автозагрузку.");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Ошибка при добавлении в автозагрузку: {ex.Message}");
-            }
-        }
-
-        static void RemoveFromStartup()
-        {
-            try
-            {
-                string appName = "Task";
-
-                using (RegistryKey key = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true))
-                {
-                    key?.DeleteValue(appName, false);
-                }
-
-                Console.WriteLine("Программа удалена из автозапуска!");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Ошибка при удалении из автозапуска: {ex.Message}");
-            }
-        }
         #endregion
 
         static void Main(string[] args)
         {
-            bool isAutoStart = args.Contains("/autostart");
-
             int actionCode;
-
-            if (isAutoStart)
-            {
-                Console.WriteLine("Ваши задачи:\n");
-                actionCode = 3;
-                Commmand(actionCode);
-            }
 
             actionCode = 1;
 
