@@ -8,6 +8,7 @@ using System.Xml;
 using System.Xml.Linq;
 using System.IO;
 using Microsoft.Win32;
+using IWshRuntimeLibrary;
 
 namespace tasks
 {
@@ -381,7 +382,7 @@ namespace tasks
             if (answ.ToLower() == "y")
             {
                 Console.WriteLine("Удаление");
-                File.Delete("tasks.xml");
+                System.IO.File.Delete("tasks.xml");
                 Console.WriteLine("Удалено");
             }
             else
@@ -403,6 +404,7 @@ namespace tasks
             Console.WriteLine("5  - Удалить запись");
             Console.WriteLine("6  - Полная очистка");
             Console.WriteLine("7  - Путь к базовой папке");
+            Console.WriteLine("8  - Создать ярлык на рабочем столе");
 
             Console.WriteLine();
         }
@@ -443,6 +445,10 @@ namespace tasks
                     Console.WriteLine("Путь к программе: " + Directory.GetCurrentDirectory());
                     Console.WriteLine();
                     break;
+                case 8:
+                    CreateShortcut();
+                    Console.WriteLine();
+                    break;
                 default:
                     Console.WriteLine("Неверная команда. Повторите попытку");
                     Console.WriteLine();
@@ -450,6 +456,40 @@ namespace tasks
             }
         }
 
+        static void CreateShortcut()
+        {
+            string currentDirectory = Directory.GetCurrentDirectory();
+
+            if (currentDirectory != null)
+            {
+                string targetExePath = Path.Combine(currentDirectory, "tasks.exe");
+                string iconPath = Path.Combine(currentDirectory, "tasks.ico");
+                string shortcutFolderPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+                string shortcutName = "Tasks";
+
+                try
+                {
+                    IWshShell3 shell = new WshShell();
+
+                    IWshShortcut shortcut = (IWshShortcut)shell.CreateShortcut(Path.Combine(shortcutFolderPath, $"{shortcutName}.lnk"));
+
+                    shortcut.TargetPath = targetExePath;
+                    shortcut.IconLocation = iconPath;
+
+                    shortcut.Save();
+
+                    Console.WriteLine("Ярлык успешно создан!");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Ошибка при создании ярлыка: {ex.Message}");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Невозможно получить путь к родительской папке.");
+            }
+        }
         #endregion
 
         static void Main(string[] args)
